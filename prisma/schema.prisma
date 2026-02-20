@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+}
+
+model Prospect {
+  id                     String   @id @default(uuid())
+  companyName            String
+  website                String
+  industry               String
+  fundingAmount          Float?
+  hiringSignals          Int?
+  adActivityLevel        Int?
+  estimatedRevenue       Float?
+  designScore            Int?
+  authorityGap           Int?
+  conversionWeakness     Int?
+  upgradeUrgencyScore    Int?
+  dealProbabilityScore   Float?
+  createdAt              DateTime @default(now())
+}
+
+model OutreachFeedback {
+  id          String   @id @default(uuid())
+  prospectId  String
+  replied     Boolean
+  callBooked  Boolean
+  dealClosed  Boolean
+  dealValue   Float?
+  lossReason  String?
+  createdAt   DateTime @default(now())
+
+  prospect Prospect @relation(fields: [prospectId], references: [id])
+}
+
+model ScoringConfig {
+  id                       String @id @default(uuid())
+  growthIntentWeight       Float  @default(0.4)
+  authorityGapWeight       Float  @default(0.3)
+  industryAffinityWeight   Float  @default(0.2)
+  websiteWeaknessWeight    Float  @default(0.1)
+}
+
+enum Role {
+  ADMIN
+  USER
+}
